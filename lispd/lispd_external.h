@@ -66,6 +66,7 @@ extern  int                     ipv6_control_input_fd;
 extern  int                     ipv4_control_input_fd;
 extern	 int                     tun_fd;
 extern  int                     nat_aware;
+extern  int                     full_nat;
 extern  lispd_site_ID           site_ID;
 extern  lispd_xTR_ID            xTR_ID;
 extern  int                     timers_fd;

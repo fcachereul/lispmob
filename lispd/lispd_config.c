@@ -1412,6 +1412,7 @@ int validate_configuration()
     /* Check configured parameters when NAT-T activated. These limitations will be removed in future release */
     if (nat_aware == TRUE){
         default_rloc_afi = AF_INET;
+        full_nat = TRUE;
 
         if (ddt_client == TRUE){
             lispd_log_msg(LISP_LOG_INFO,"NAT aware on -> No DDT client available");

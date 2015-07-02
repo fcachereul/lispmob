@@ -139,6 +139,7 @@ nlsock_handle               nlh;
 /* NAT */
 
 int                         nat_aware;
+int                         full_nat = FALSE;
 lispd_site_ID               site_ID;
 lispd_xTR_ID                xTR_ID;
 

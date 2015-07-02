@@ -206,11 +206,8 @@ int err;
 //#define UNKNOWN         255
 #define NO_NAT              0
 #define NAT                 1
-#define PARTIAL_NAT         2
-#define FULL_NAT            3
-#define NO_INFO_REPLY       4   /* NAT status of a locator change from UNKNOWN to NO_INFO_REPLY when
+#define NO_INFO_REPLY       2   /* NAT status of a locator change from UNKNOWN to NO_INFO_REPLY when
                                  * reached the maximum number of retransmits of info request */
-
 
 #define MAX_IP_PACKET       4096
 

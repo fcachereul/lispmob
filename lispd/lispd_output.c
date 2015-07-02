@@ -607,7 +607,7 @@ int lisp_output (
     }
 
     /* If we are behind a full nat system, send the packet directly to the RTR */
-    if (nat_aware == TRUE){
+    if (full_nat == TRUE){
         if (select_src_locators_from_balancing_locators_vec (src_mapping,tuple,&outer_src_locator) != GOOD){
             return (BAD);
         }

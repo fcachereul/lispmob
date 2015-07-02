@@ -270,6 +270,7 @@ int process_info_reply_msg(
         nat_info->status= NAT;
     }else{
         nat_info->status= NO_NAT;
+        full_nat = FALSE;
     }
 
     /*
