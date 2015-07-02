@@ -107,6 +107,9 @@ int get_locators_length(
          */
         if (nat_aware == TRUE ){
             nat_info = ((lcl_locator_extended_info *)locator->extended_info)->nat_info;
+        }
+
+        if (nat_info && nat_info->status != NO_NAT) {
             if (nat_info->status == UNKNOWN || nat_info->status == NO_INFO_REPLY){
                 locators_list = locators_list->next;
                 continue;
@@ -114,11 +117,13 @@ int get_locators_length(
             // Even a RTR is associated with more than one interface, we only add the same RTR one time
             if (compare_lisp_addr_t (prev_rtr_addr, &(nat_info->rtr_locators_list->locator->address))== 0){
                 locators_list = locators_list->next;
-                continue;
             }else{
                 prev_rtr_addr = &(nat_info->rtr_locators_list->locator->address);
             }
+        } else {
+            locators_list = locators_list->next;
         }
+
     	/* If the locator is behind NAT, the afi of the RTR is the same of the local locator */
         switch (locator->locator_addr->afi) {
         case AF_INET:
@@ -135,7 +140,6 @@ int get_locators_length(
                locator->locator_addr->afi);
             break;
         }
-        locators_list = locators_list->next;
     }
     *loc_count = num_loc;
 
@@ -323,8 +327,7 @@ uint8_t *pkt_fill_mapping_record(
                 continue;
             }
 
-            if (nat_info != NULL){
-                nat_info = ((lcl_locator_extended_info *)locator->extended_info)->nat_info;
+            if (nat_info != NULL && nat_info->status != NO_NAT){
                 // XXX Locators using RTR whose interface is down are not added
                 // XXX When locator don't use RTR, it is added with R bit = 0 and priority 255
                 if (nat_info->status == UNKNOWN || nat_info->status == NO_INFO_REPLY){
@@ -333,13 +336,21 @@ uint8_t *pkt_fill_mapping_record(
                 }
                 // Even a RTR is associated with more than one interface, we only add the same RTR one time
                 if (compare_lisp_addr_t (last_rtr_addr, &(nat_info->rtr_locators_list->locator->address))== 0){
+                    loc_ptr->reachable = 0;
+                    itr_address = locator->locator_addr;
                     locators_list[ctr] = locators_list[ctr]->next;
-                    continue;
                 }else{
                     last_rtr_addr = &(nat_info->rtr_locators_list->locator->address);
+                    itr_address = last_rtr_addr;
+                    loc_ptr->reachable = 1;
                 }
+            } else {
+                loc_ptr->reachable = *(locator->state);
+                itr_address = locator->locator_addr;
+                locators_list[ctr] = locators_list[ctr]->next;
             }
 
+            loc_ptr->locator_afi = htons(get_lisp_afi(itr_address->afi,NULL));
             loc_ptr->priority    = locator->priority;
             loc_ptr->weight      = locator->weight;
             loc_ptr->mpriority   = locator->mpriority;
@@ -349,16 +360,6 @@ uint8_t *pkt_fill_mapping_record(
                 loc_ptr->probed  = 1;
             }
 
-            loc_ptr->reachable   = *(locator->state);
-
-
-            if (nat_info != NULL && nat_info->rtr_locators_list != NULL){
-                itr_address = &(nat_info->rtr_locators_list->locator->address);
-            }else{
-                itr_address = locator->locator_addr;
-            }
-            loc_ptr->locator_afi = htons(get_lisp_afi(itr_address->afi,NULL));
-
             if ((cpy_len = copy_addr((void *) CO(loc_ptr,
                     sizeof(lispd_pkt_mapping_record_locator_t)), itr_address, 0)) == 0) {
                 lispd_log_msg(LISP_LOG_DEBUG_3, "pkt_fill_mapping_record: copy_addr failed for locator %s",
@@ -366,21 +367,21 @@ uint8_t *pkt_fill_mapping_record(
                 return(NULL);
             }
 
-            if (nat_info == NULL || (nat_info != NULL && nat_info->rtr_locators_list == NULL)){
+            if (nat_info == NULL || nat_info->status == NO_NAT ||
+                    compare_lisp_addr_t (itr_address, &(nat_info->rtr_locators_list->locator->address)) != 0) {
                 lispd_log_msg(LISP_LOG_DEBUG_2, "Record information Locator: %s  P:%d-W:%d-MP:%d-MW:%d  Reachable: %d Probed: %d",
-                        get_char_from_lisp_addr_t(*(locators_list[ctr]->locator->locator_addr)),
-                        loc_ptr->priority, loc_ptr->weight, loc_ptr->mpriority, loc_ptr->mweight, loc_ptr->reachable, loc_ptr->probed);
+                              get_char_from_lisp_addr_t(*itr_address),
+                              loc_ptr->priority, loc_ptr->weight,
+                              loc_ptr->mpriority, loc_ptr->mweight,
+                              loc_ptr->reachable, loc_ptr->probed);
             }else {
                 lispd_log_msg(LISP_LOG_DEBUG_2, "Record information Locator: %s (RTR)",
-                        get_char_from_lisp_addr_t(nat_info->rtr_locators_list->locator->address));
+                              get_char_from_lisp_addr_t(*itr_address));
             }
 
             locator_count++;
             loc_ptr = (lispd_pkt_mapping_record_locator_t *)
                             CO(loc_ptr, (sizeof(lispd_pkt_mapping_record_locator_t) + cpy_len));
-
-
-            locators_list[ctr] = locators_list[ctr]->next;
 
         }
     }
