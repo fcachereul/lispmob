@@ -114,9 +114,7 @@ int map_register(
                 loc_list[ctr] = loc_list[ctr]->next;
             }
         }
-        if (all_loc_ready == TRUE){
-            result = encapsulated_map_register_process(timer_arg);
-        }else{
+        if (all_loc_ready == FALSE){
             // XXX To check the number of retries. If we never receive a Map Reply --> New status in Inf req?
             nat_info = ((lcl_locator_extended_info *)src_locator->extended_info)->nat_info;
             if (nat_info->emap_reg_timer == NULL) {
@@ -127,6 +125,13 @@ int map_register(
                     get_char_from_lisp_addr_t(mapping->eid_prefix), mapping->eid_prefix_length,LISPD_INITIAL_MR_TIMEOUT);
             return(BAD);
         }
+
+        nat_info = ((lcl_locator_extended_info *)(src_locator->extended_info))->nat_info;
+
+        if(nat_info && nat_info->status == NAT)
+            result = encapsulated_map_register_process(timer_arg);
+        else
+            result = map_register_process(timer_arg);
     }else{
         result = map_register_process(timer_arg);
     }

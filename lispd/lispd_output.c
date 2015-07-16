@@ -578,6 +578,7 @@ int lisp_output (
     lisp_addr_t                 *dst_addr           = NULL;
     int                         output_socket       = 0;
     lcl_locator_extended_info   *loc_extended_info  = NULL;
+    nat_info_str                *nat_info           = NULL;
     packet_tuple                tuple;
     int                         result              = 0;
 
@@ -678,7 +679,8 @@ int lisp_output (
 
     /* If the selected src locator is behind NAT, fordware to the RTR */
     loc_extended_info = (lcl_locator_extended_info *)outer_src_locator->extended_info;
-    if (loc_extended_info->nat_info != NULL && loc_extended_info->nat_info->rtr_locators_list != NULL){
+    nat_info = loc_extended_info->nat_info;
+    if (nat_info && nat_info->status == NAT && nat_info->rtr_locators_list){
         dst_addr = &(loc_extended_info->nat_info->rtr_locators_list->locator->address);
     }
 
