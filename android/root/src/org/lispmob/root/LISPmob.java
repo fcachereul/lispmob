@@ -79,8 +79,8 @@ public class LISPmob extends Activity implements OnClickListener {
 		/* Get the directory of the executable */
 		
 		try{
-			lispd_path =  getPackageManager().getApplicationInfo("org.lispmob.root", 0).nativeLibraryDir;
-			conf_file = Environment.getExternalStorageDirectory().getAbsolutePath() + "/lispd.conf";
+			lispd_path = getApplicationInfo().nativeLibraryDir;
+			conf_file = getApplicationInfo().dataDir + "/lispd.conf";
 		}catch(Exception e)
 		{
 			e.printStackTrace();

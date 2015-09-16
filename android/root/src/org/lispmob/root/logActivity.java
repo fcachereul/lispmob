@@ -68,8 +68,7 @@ public class logActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		File sdcardDir = Environment.getExternalStorageDirectory();
-		log_file = new File(sdcardDir, "lispd.log");
+		log_file = new File(getApplicationInfo().dataDir + "/lispd.log");
 
 		setContentView(R.layout.log);
 		//myDialog = ProgressDialog.show( logActivity.this, " " , " Loading. Please wait ... ", true);

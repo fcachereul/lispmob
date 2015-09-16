@@ -60,8 +60,6 @@ import android.widget.ArrayAdapter;
 
 public class updateConfActivity extends Activity {
 	
-	public static final String confFile = "lispd.conf";
-	
 	public static String eidIPv4 = "";
 	public static String eidIPv6 = "";
 	public static List<String> ifaces = null;
@@ -88,9 +86,8 @@ public class updateConfActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.updateconf); 
 		
-		File sdcardDir = Environment.getExternalStorageDirectory();
-		conf_file = new File(sdcardDir, confFile);
-		log_file = sdcardDir.getAbsolutePath()+"/lispd.log";
+		conf_file = new File(getApplicationInfo().dataDir + "/lispd.conf");
+		log_file = getApplicationInfo().dataDir + "/lispd.log";
 		
 		iface_list = ConfigTools.get_ifaces_list();
 		

@@ -13,29 +13,32 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.os.Environment;
 import android.util.Log;
 import android.widget.CheckBox;
+import android.content.Context;
+import android.app.Activity;
 
 public class ConfigTools {
+
+	private File conf_file = null;
 	
-	public static final String confFile = "lispd.conf";
-	
-	public static List<String> getEIDs() throws FileNotFoundException
+	public ConfigTools(final String confFile) throws FileNotFoundException
 	{
-		File sdcardDir = Environment.getExternalStorageDirectory();
-		File file = new File(sdcardDir, confFile);
+		conf_file = new File(confFile);
 		
-		if (!file.exists()){
+		if (!conf_file.exists()){
 			Log.w("LISPmob", "Configuration file not exist");
 			throw new FileNotFoundException();
 		}
-		
+	}
+
+	public List<String> getEIDs()
+	{
 		List<String> eids = new ArrayList<String>();
 		
 		try {
 			
-			BufferedReader  br = new BufferedReader(new FileReader(file));
+			BufferedReader  br = new BufferedReader(new FileReader(conf_file));
 			String line 	= br.readLine();
 			String sub_line	= null;
 			
@@ -80,22 +83,14 @@ public class ConfigTools {
 		return eids;
 	}
 	
-	public static String[] getDNS() throws FileNotFoundException
+	public String[] getDNS()
 	{
 		String dns_servers[] = {null,null};
-		File sdcardDir = Environment.getExternalStorageDirectory();
-		File file = new File(sdcardDir, confFile);
 		boolean overrideDNS = false;
-		
-
-		if (!file.exists()){
-			Log.w("LISPmob", "Configuration file not exist");
-			throw new FileNotFoundException();
-		}
 		
 		try {
 			
-			BufferedReader  br = new BufferedReader(new FileReader(file));
+			BufferedReader  br = new BufferedReader(new FileReader(conf_file));
 			String line 	= br.readLine();
 			
 			while ( line != null ) {
@@ -218,20 +213,13 @@ public class ConfigTools {
 		return (iface_list);
 	}
 	
-	public static boolean isOverwriteDNS() throws FileNotFoundException
+	public boolean isOverwriteDNS()
 	{
-		File sdcardDir = Environment.getExternalStorageDirectory();
-		File file = new File(sdcardDir, confFile);
 		boolean overrideDNS = false;
-		
-		if (!file.exists()){
-			Log.w("LISPmob", "Configuration file not exist");
-			throw new FileNotFoundException();
-		}
 		
 		try {
 			
-			BufferedReader  br = new BufferedReader(new FileReader(file));
+			BufferedReader  br = new BufferedReader(new FileReader(conf_file));
 			String line 	= br.readLine();
 			
 			while ( line != null ) {

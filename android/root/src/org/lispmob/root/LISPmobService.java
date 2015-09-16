@@ -42,6 +42,15 @@ public class LISPmobService extends Service implements Runnable{
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId){
 		
+		ConfigTools confTools;
+
+		try {
+			confTools = new ConfigTools(getApplicationInfo().dataDir + "/lispd.conf");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return START_NOT_STICKY;
+		}
+		
 		try {
 			shell = new SuShell();
 		} catch (IOException e1) {}
@@ -66,21 +75,11 @@ public class LISPmobService extends Service implements Runnable{
 		if (start == true){
 			if (thread != null){
 				Log.i(TAG, "LISPmob Service already running");
-				try {
-					lispmob_dns = ConfigTools.getDNS();
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-					return START_NOT_STICKY;
-				}
+				lispmob_dns = confTools.getDNS();
 			}else{
 				Log.i(TAG, "Starting LISPmob Service.");
 				system_dns = get_dns_servers();
-				try {
-					lispmob_dns = ConfigTools.getDNS();
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-					return START_NOT_STICKY;
-				}
+				lispmob_dns = confTools.getDNS();
 				thread = new Thread(this, "LISPmobService");
 				thread.start();
 				/* Put the service in background mode */

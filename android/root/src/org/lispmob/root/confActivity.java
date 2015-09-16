@@ -45,11 +45,10 @@ public class confActivity extends Activity {
 		setContentView(R.layout.conf); 
 		refresh();
 	}
-	final String confFileLocation = "/sdcard/lispd.conf";
 	
 	private void refresh() {
 		final TextView statusView = (TextView) findViewById(R.id.confView);
-    	File infoFile = new File(confFileLocation);
+    		File infoFile = new File(getApplicationInfo().dataDir + "/lispd.conf");
     	BufferedReader reader;
     	
     	
