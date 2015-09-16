@@ -48,8 +48,8 @@ LOCAL_SRC_FILES = \
 		  	hmac/hmac-sha1.c \
 		  	patricia/patricia.c
 
-LOCAL_CFLAGS += -g -DANDROID
-LOCAL_LDLIBS := -llog
+LOCAL_CFLAGS += -g -DANDROID -fPIE -pie
+LOCAL_LDLIBS := -llog -fPIE -pie
 LOCAL_STATIC_LIBRARIES := libconfuse 
 LOCAL_SHARED_LIBRARIES := libcutils
 LOCAL_MODULE = lispd
